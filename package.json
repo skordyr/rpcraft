@@ -1,6 +1,6 @@
 {
   "name": "rpcraft",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Type-safe RPC toolkit for client and server, built to run anywhere.",
   "homepage": "https://github.com/skordyr/rpcraft#readme",
   "license": "MIT",
