@@ -1,4 +1,4 @@
-import type { Link, LinkOperation } from "./link";
+import type { Link, LinkNext, LinkOperation } from "./link";
 import type { Thunkable } from "./shared/types";
 import type { AnyCommand, Context, InferCommandOutput, InferCommandType } from "./types";
 
@@ -43,6 +43,14 @@ export function createExecute<TContext extends Context>(
 
   const getContext = context && typeof context === "function" ? context : () => context;
 
+  const fallback: LinkNext<TContext> = () => {
+    return promise(() => {
+      throw CommandError.from("INTERNAL_SERVER_ERROR", {
+        message: "Cannot execute command: no link handled the operation.",
+      });
+    });
+  };
+
   async function* stream(command: AnyCommand, context: Context = {}) {
     const operation: LinkOperation<any> = {
       context,
@@ -59,13 +67,7 @@ export function createExecute<TContext extends Context>(
         };
       }
 
-      yield* link(operation, () => {
-        return promise(() => {
-          throw CommandError.from("INTERNAL_SERVER_ERROR", {
-            message: "Cannot execute command: no link handled the operation.",
-          });
-        });
-      });
+      yield* link(operation, fallback);
     } catch (error) {
       const { context, command } = operation;
 

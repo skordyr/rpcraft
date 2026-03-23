@@ -1,3 +1,4 @@
+import type { CommandKnownErrorCode } from "../error";
 import type { Link, LinkNext, LinkOperation, LinkResult } from "../link";
 import type { Router, RouterEntry } from "../router";
 import type { Thunkable } from "../shared/types";
@@ -12,7 +13,7 @@ import type {
 } from "./protocol";
 
 import { isSubscriptionCommand } from "../builder";
-import { CommandError, type CommandKnownErrorCode } from "../error";
+import { CommandError } from "../error";
 import { iterator, promise } from "../iterator";
 import { pipe } from "../link";
 import {
@@ -61,7 +62,7 @@ export class RPCServer<TContext extends Context> {
 
     const resolveCache: Map<RouterEntry<TContext>, Link<TContext, Context>> = new Map();
 
-    const notFound: LinkNext<TContext> = () => {
+    const fallback: LinkNext<TContext> = () => {
       return promise(() => {
         throw CommandError.from("NOT_FOUND", {
           message: "Request failed: no route matched for the request.",
@@ -97,15 +98,15 @@ export class RPCServer<TContext extends Context> {
             resolve = entry[1];
           }
 
-          return resolve(router.prepare(operation), notFound);
+          return resolve(router.prepare(operation), fallback);
         }
       }
 
       if (link) {
-        return link(operation, notFound);
+        return link(operation, fallback);
       }
 
-      return notFound();
+      return fallback();
     };
 
     if (autoStart) {

@@ -70,11 +70,45 @@ export function iterator<TResult>(factory: IteratorFactory<TResult>): AsyncItera
 }
 
 export interface PromiseFactory<TResult> {
-  (): TResult | Promise<TResult>;
+  (onExit: (dispose: (closed: boolean) => void) => void): TResult | Promise<TResult>;
 }
 
 export async function* promise<TResult>(factory: PromiseFactory<TResult>): AsyncGenerator<TResult> {
-  yield await factory();
+  const disposes: Array<(closed: boolean) => void> = [];
+
+  let $closed = false;
+
+  const onExit = (dispose: (closed: boolean) => void) => {
+    if ($closed) {
+      dispose(true);
+
+      return;
+    }
+
+    disposes.push(dispose);
+  };
+
+  try {
+    yield await factory(onExit);
+
+    $closed = true;
+  } catch (error) {
+    $closed = true;
+
+    throw error;
+  } finally {
+    try {
+      for (let index = disposes.length - 1; index >= 0; index -= 1) {
+        const dispose = disposes[index];
+
+        dispose($closed);
+      }
+    } finally {
+      if (!$closed) {
+        $closed = true;
+      }
+    }
+  }
 }
 
 interface Deferred<TResult> {
