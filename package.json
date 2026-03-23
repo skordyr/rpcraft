@@ -25,7 +25,11 @@
     "./links/validate": "./dist/links/validate/index.mjs",
     "./rpc": "./dist/rpc.mjs",
     "./template": "./dist/template.mjs",
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./links/*": {
+      "types": "./dist/links/*/index.d.mts",
+      "default": "./dist/links/*/index.mjs"
+    }
   },
   "scripts": {
     "format": "oxfmt",
