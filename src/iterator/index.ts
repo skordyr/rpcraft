@@ -8,7 +8,7 @@ export async function toPromise<TResult>(iterator: AsyncIteratorObject<TResult>)
   }
 
   if (!hasResult) {
-    throw new Error("Cannot resolve iterator result: no values were yielded.");
+    throw new Error("No values were yielded. The iterator needs to yield at least one value.");
   }
 
   return result as TResult;
@@ -183,7 +183,7 @@ export async function* emittable<TResult>(
 
       if (pending.length > 0) {
         for (const deferred of pending) {
-          deferred.reject(new Error("Cannot emit: generator has returned."));
+          deferred.reject(new Error("The generator has already returned."));
         }
 
         pending.length = 0;
@@ -228,7 +228,7 @@ export async function* emittable<TResult>(
 
         if (pending.length > 0) {
           for (const deferred of pending) {
-            deferred.reject(new Error("Cannot emit: generator has been terminated."));
+            deferred.reject(new Error("The generator has been terminated."));
           }
 
           pending.length = 0;

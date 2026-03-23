@@ -87,19 +87,19 @@ const create: Builder$Create = () => {
 
       if (type === undefined) {
         throw new Error(
-          "Cannot build command: missing type. Start with query(...), mutation(...), or subscription(...).",
+          '"type" is required. Please use query(...), mutation(...), or subscription(...) to specify the type.',
         );
       }
 
       if (name === undefined) {
         throw new Error(
-          "Cannot build command: missing name. Pass name as the first argument to query(...), mutation(...), or subscription(...), then call build().",
+          '"name" is required. Please use query(...), mutation(...), or subscription(...) and specify the name as the first argument.',
         );
       }
 
       if (meta === undefined) {
         throw new Error(
-          "Cannot build command: missing meta. Pass meta as the second argument to query(...), mutation(...), or subscription(...), then call build().",
+          '"meta" is required. Please use query(...), mutation(...), or subscription(...) and specify the meta as the second argument.',
         );
       }
 
@@ -117,7 +117,7 @@ const create: Builder$Create = () => {
     schema(schema) {
       if ($definition === EMPTY_OBJECT) {
         throw new Error(
-          "Cannot set schema: no active chain. Start with query(...), mutation(...), or subscription(...) first.",
+          "There is no active command build. Please use query(...), mutation(...), or subscription(...) first.",
         );
       }
 
@@ -129,9 +129,7 @@ const create: Builder$Create = () => {
 
   const $type: (type: CommandType) => Builder$Type<any, any> = (type) => (name, meta) => {
     if ($definition !== EMPTY_OBJECT) {
-      throw new Error(
-        "Cannot start a new chain: the current chain is not finished. Call build() or schema(...).build() first.",
-      );
+      throw new Error("The current build is not finished. Please use build() to finish it.");
     }
 
     $definition = {

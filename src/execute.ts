@@ -46,7 +46,7 @@ export function createExecute<TContext extends Context>(
   const fallback: LinkNext<TContext> = () => {
     return promise(() => {
       throw CommandError.from("INTERNAL_SERVER_ERROR", {
-        message: "Cannot execute command: no link handled the operation.",
+        message: "No link handled the operation.",
       });
     });
   };
@@ -73,6 +73,7 @@ export function createExecute<TContext extends Context>(
 
       throw CommandError.from(error, {
         code: "INTERNAL_SERVER_ERROR",
+        message: "An unexpected error occurred while executing the operation.",
         context,
         command,
       });

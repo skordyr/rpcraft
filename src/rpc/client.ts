@@ -114,7 +114,8 @@ export class RPCClient<TContext extends Context> {
         if (!isSubscriptionCommand(command)) {
           emitter.throw(
             CommandError.from("INTERNAL_SERVER_ERROR", {
-              message: "Request failed: unexpected started response for non-subscription command.",
+              message:
+                "Received an unexpected 'started' response for the non-subscription command.",
               context,
               command,
             }),
@@ -148,7 +149,8 @@ export class RPCClient<TContext extends Context> {
 
           emitter.throw(
             CommandError.from("INTERNAL_SERVER_ERROR", {
-              message: "Request failed: unexpected stopped response for non-subscription command.",
+              message:
+                "Received an unexpected 'stopped' response for the non-subscription command.",
               context,
               command,
             }),
@@ -243,7 +245,7 @@ export class RPCClient<TContext extends Context> {
 
       emitter.throw(
         CommandError.from("SERVICE_UNAVAILABLE", {
-          message: "Request failed: client is stopped.",
+          message: "The client has been stopped.",
           context,
           command,
         }),
@@ -283,7 +285,7 @@ export class RPCClient<TContext extends Context> {
 
           emitter.throw(
             CommandError.from("TIMEOUT", {
-              message: `Request failed: request timeout after ${timeout}ms.`,
+              message: `The operation timeout occurred after ${timeout}ms.`,
               context,
               command,
             }),
@@ -309,7 +311,7 @@ export class RPCClient<TContext extends Context> {
 
           emitter.throw(
             CommandError.from("CLIENT_CLOSED_REQUEST", {
-              message: "Request failed: request aborted by signal.",
+              message: "The operation was aborted by the signal.",
               context,
               command,
             }),

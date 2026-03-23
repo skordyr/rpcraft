@@ -66,7 +66,7 @@ export function ValidateLink<TContext extends Context>(
           const { issues } = result;
 
           throw CommandError.from("BAD_REQUEST", {
-            message: "Command input validation failed.",
+            message: "The command input is invalid.",
             cause: {
               issues,
             },
@@ -85,7 +85,7 @@ export function ValidateLink<TContext extends Context>(
               const { issues } = result;
 
               throw CommandError.from("INTERNAL_SERVER_ERROR", {
-                message: "Command output validation failed.",
+                message: "The command output is invalid.",
                 cause: {
                   issues,
                 },
@@ -107,7 +107,7 @@ export function ValidateLink<TContext extends Context>(
             const { issues } = result;
 
             throw CommandError.from("INTERNAL_SERVER_ERROR", {
-              message: "Command error validation failed.",
+              message: "The command error is invalid.",
               cause: {
                 error,
                 issues,

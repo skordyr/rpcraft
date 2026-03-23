@@ -139,7 +139,7 @@ class Router$Router<
     const name = factory.definition.name as CommandName;
 
     if (this.registry[type].has(name)) {
-      throw new Error(`Cannot handle command: "${type}:${name}" is already handled.`);
+      throw new Error(`The command "${type}:${name}" is already handled.`);
     }
 
     const link = pipe(...this._links, handler as AnyLink);

@@ -131,7 +131,7 @@ export async function* request(
 
       disposeSignal?.();
 
-      controller.abort(new Error(`Request failed: request timeout after ${timeout}ms.`));
+      controller.abort(new Error(`The request timeout occurred after ${timeout}ms.`));
     }, timeout);
 
     disposeTimeout = () => {
@@ -154,7 +154,7 @@ export async function* request(
       const { target } = event;
 
       controller.abort(
-        new Error(`Request failed: request aborted by signal.`, { cause: (target as any)?.reason }),
+        new Error(`The request was aborted by the signal.`, { cause: (target as any)?.reason }),
       );
     };
 
@@ -220,7 +220,7 @@ export async function* request(
   };
 
   const $abort = (): HTTPRequestResult => {
-    return $error(controller.signal.reason || new Error("Request failed: request aborted."));
+    return $error(controller.signal.reason || new Error("The request was aborted."));
   };
 
   try {
@@ -366,7 +366,7 @@ export async function* request(
 
     $dispose();
 
-    yield $error(new Error(`Request failed: response status ${response.status}.`), data);
+    yield $error(new Error(`The server responded with status "${response.status}".`), data);
   } catch (error) {
     if (closed) {
       yield $abort();

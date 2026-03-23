@@ -65,7 +65,7 @@ export class RPCServer<TContext extends Context> {
     const fallback: LinkNext<TContext> = () => {
       return promise(() => {
         throw CommandError.from("NOT_FOUND", {
-          message: "Request failed: no route matched for the request.",
+          message: "No route matched the command.",
         });
       });
     };
@@ -262,7 +262,10 @@ export class RPCServer<TContext extends Context> {
             port.postMessage(message);
           }
         } catch (error) {
-          const $error = CommandError.from(error, {});
+          const $error = CommandError.from(error, {
+            code: "INTERNAL_SERVER_ERROR",
+            message: "An unexpected error occurred while processing the request.",
+          });
 
           const definition =
             COMMAND_KNOWN_RPC_ERROR_DEFINITION[$error.code as CommandKnownErrorCode] ||
@@ -272,7 +275,7 @@ export class RPCServer<TContext extends Context> {
             id,
             error: {
               code: definition.code,
-              message: definition.message,
+              message: $error.message || definition.message,
               data: $error.data,
             },
           };
@@ -302,8 +305,7 @@ export class RPCServer<TContext extends Context> {
         if (!isSubscriptionCommand(command)) {
           iterator.throw(
             CommandError.from("BAD_REQUEST", {
-              message:
-                "Request failed: unexpected stop subscription request for non-subscription command.",
+              message: "Received a stop subscription request for a non-subscription command.",
             }),
           );
 
@@ -331,7 +333,7 @@ export class RPCServer<TContext extends Context> {
 
           iterator.throw(
             CommandError.from("SERVICE_UNAVAILABLE", {
-              message: "Request failed: connection is closed.",
+              message: "The connection has been closed.",
             }),
           );
         }
