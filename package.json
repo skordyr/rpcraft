@@ -18,7 +18,6 @@
   "types": "./dist/index.d.mts",
   "exports": {
     ".": "./dist/index.mjs",
-    "./iterator": "./dist/iterator.mjs",
     "./links/http": "./dist/links/http/index.mjs",
     "./links/log": "./dist/links/log/index.mjs",
     "./links/mock": "./dist/links/mock/index.mjs",
