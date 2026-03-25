@@ -204,8 +204,8 @@ export function isCommandError(target: unknown) {
 
   return Boolean(
     candidate &&
-    candidate.name === "CommandError" &&
     candidate.code &&
+    candidate.name === "CommandError" &&
     typeof candidate.code === "string",
   );
 }

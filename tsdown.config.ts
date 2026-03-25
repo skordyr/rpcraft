@@ -1,18 +1,14 @@
 import { defineConfig } from "tsdown";
 
 export default defineConfig({
-  exports: {
-    customExports: {
-      "./links/*": {
-        types: "./dist/links/*/index.d.mts",
-        default: "./dist/links/*/index.mjs",
-      },
-    },
-  },
+  exports: true,
   entry: {
     index: "./src/index.ts",
-    template: "./src/template/index.ts",
     rpc: "./src/rpc/index.ts",
-    "links/*": "./src/links/*/index.ts",
+    template: "./src/template/index.ts",
+    "http-link": "./src/links/http-link/index.ts",
+    "log-link": "./src/links/log-link/index.ts",
+    "mock-link": "./src/links/mock-link/index.ts",
+    "validate-link": "./src/links/validate-link/index.ts",
   },
 });
