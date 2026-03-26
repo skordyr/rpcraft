@@ -501,7 +501,7 @@ try {
   await execute(GetTodo.create({ variables: { id: todo.id } }));
 } catch (error) {
   if (isCommandError(error, GetTodo)) {
-    console.error("error:", error.cause);
+    console.error("error:", error);
   }
 }
 ```
