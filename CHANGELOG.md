@@ -1,5 +1,15 @@
 # rpcraft
 
+## 0.2.1
+
+### Patch Changes
+
+- 44f8ea8: Fix missing query string separator in HTTP request URL construction
+
+  Added missing `?` character when building URLs with search parameters. Previously, URLs were incorrectly formatted as `{url}{search}` instead of `{url}?{search}`.
+
+- 7072a67: Fix README example to log full error object
+
 ## 0.2.0
 
 ### Minor Changes
