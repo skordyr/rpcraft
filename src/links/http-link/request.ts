@@ -97,7 +97,7 @@ export async function* request(
   const search = params && stringifyParams(params);
   const controller = new AbortController();
 
-  const $url = search ? `${url}${search}` : url;
+  const $url = search ? `${url}?${search}` : url;
   const $body = isJsonData ? stringifyData(data) : (data as BodyInit);
   const $headers = isJsonData || headers ? new Headers(headers && toEntries(headers)) : undefined;
   const $signal = controller.signal;

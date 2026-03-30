@@ -6,7 +6,6 @@
 
 - e2c6d4d: Migrate `rpcraft/iterator` subpath export to main package
 - c4527fb: Rename link exports for explicit naming
-
   - `rpcraft/links/http` → `rpcraft/http-link`
   - `rpcraft/links/log` → `rpcraft/log-link`
   - `rpcraft/links/mock` → `rpcraft/mock-link`
@@ -20,7 +19,6 @@
 
 - 1a01c52: `promise` now supports `onExit` callback for registering dispose functions (executed in LIFO order)
 - a28998a: Improve package exports with explicit `types` condition for IDE auto-completion
-
   - Add `./links/*` wildcard exports with `types` and `default` conditions
   - Update tsdown config to use custom exports configuration
   - Enable TypeScript language server to resolve types for subpath imports
