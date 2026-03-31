@@ -1,5 +1,18 @@
 # rpcraft
 
+## 0.2.2
+
+### Patch Changes
+
+- af90eef: Add `RelayMessagePort` and `RelayMessageChannel` for flexible message transport
+
+  - `RelayMessagePort`: Wraps any message mechanism (Electron IPC, WebSocket, etc.) into `RPCMessagePort`
+  - `RelayMessageChannel`: Creates a bidirectional message channel within the same thread
+  - **Note on lifecycle differences from native MessagePort:**
+    - `start()` only affects message receiving; `postMessage` can be called before start
+    - `close()` stops receiving but `postMessage` can still be called (messages sent to a closed port are silently dropped)
+  - Auto-starts by default with optional manual control
+
 ## 0.2.1
 
 ### Patch Changes
@@ -29,6 +42,7 @@
 
 - 1a01c52: `promise` now supports `onExit` callback for registering dispose functions (executed in LIFO order)
 - a28998a: Improve package exports with explicit `types` condition for IDE auto-completion
+
   - Add `./links/*` wildcard exports with `types` and `default` conditions
   - Update tsdown config to use custom exports configuration
   - Enable TypeScript language server to resolve types for subpath imports
