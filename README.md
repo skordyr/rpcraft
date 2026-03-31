@@ -4,12 +4,12 @@ Type-safe RPC toolkit for client and server, built to run anywhere.
 
 ## Highlights
 
-🔗 **End-to-End Type Safety:** One definition for client and server with fully typed inputs, outputs, and errors.
-🔌 **Extendability:** Build powerful middleware by composing links for auth, logging, and more.
-🔠 **Standard Schema Support:** Built on the Standard Schema spec, works with Zod, Valibot, ArkType, and more.
-📡 **Streaming:** Unified streaming abstraction via AsyncIterator, with Server-Sent Events powered by standard fetch streams.
-🌍 **Platform Agnostic:** Runs on any JavaScript runtime and simple to extend for browsers, Node.js, Cloudflare, Deno, Bun, and more.
-🪶 **Lightweight:** Minimal core with simple extension mechanism and tree-shakeable ESM for importing only what you need.
+- 🔗 **End-to-End Type Safety:** One definition for client and server with fully typed inputs, outputs, and errors.
+- 🔌 **Extendability:** Build powerful middleware by composing links for auth, logging, and more.
+- 🔠 **Standard Schema Support:** Built on the Standard Schema spec, works with Zod, Valibot, ArkType, and more.
+- 📡 **Streaming:** Unified streaming abstraction via AsyncIterator, with Server-Sent Events powered by standard fetch streams.
+- 🌍 **Platform Agnostic:** Runs on any JavaScript runtime and simple to extend for browsers, Node.js, Cloudflare, Deno, Bun, and more.
+- 🪶 **Lightweight:** Minimal core with simple extension mechanism and tree-shakeable ESM for importing only what you need.
 
 ## Documentation
 
