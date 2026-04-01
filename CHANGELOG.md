@@ -1,11 +1,20 @@
 # rpcraft
 
+## 0.2.3
+
+### Patch Changes
+
+- 5edce20: Add `Event`, `State`, and `subscribe` for reactive primitives
+  - Add `Event` class with lazy activation/deactivation and multi-subscriber support
+  - Add `State` class for reactive state management with current value access
+  - Add `Subscriber` interface and `subscribe` function for observer pattern
+  - Rename `LogLinkHandler` `reason` parameter to `error` for clarity
+
 ## 0.2.2
 
 ### Patch Changes
 
 - af90eef: Add `RelayMessagePort` and `RelayMessageChannel` for flexible message transport
-
   - `RelayMessagePort`: Wraps any message mechanism (Electron IPC, WebSocket, etc.) into `RPCMessagePort`
   - `RelayMessageChannel`: Creates a bidirectional message channel within the same thread
   - **Note on lifecycle differences from native MessagePort:**
@@ -42,7 +51,6 @@
 
 - 1a01c52: `promise` now supports `onExit` callback for registering dispose functions (executed in LIFO order)
 - a28998a: Improve package exports with explicit `types` condition for IDE auto-completion
-
   - Add `./links/*` wildcard exports with `types` and `default` conditions
   - Update tsdown config to use custom exports configuration
   - Enable TypeScript language server to resolve types for subpath imports
