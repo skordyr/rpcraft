@@ -23,6 +23,10 @@ export type LogLinkOutContext = {
 
 export interface LogLinkHandler<TContext extends Context> {
   start?(operation: LinkOperation<Simplify<LogLinkOutContext & TContext>>): void;
+  dispose?(
+    operation: LinkOperation<Simplify<LogLinkOutContext & TContext>>,
+    duration: number,
+  ): void;
   next?(
     operation: LinkOperation<Simplify<LogLinkOutContext & TContext>>,
     duration: number,
@@ -31,13 +35,9 @@ export interface LogLinkHandler<TContext extends Context> {
   error?(
     operation: LinkOperation<Simplify<LogLinkOutContext & TContext>>,
     duration: number,
-    reason: unknown,
+    error: unknown,
   ): void;
   complete?(
-    operation: LinkOperation<Simplify<LogLinkOutContext & TContext>>,
-    duration: number,
-  ): void;
-  dispose?(
     operation: LinkOperation<Simplify<LogLinkOutContext & TContext>>,
     duration: number,
   ): void;

@@ -4,6 +4,10 @@ export function IDENTITY<TValue>(value: TValue): TValue {
   return value;
 }
 
+export function run<TResult>(fn: () => TResult): TResult {
+  return fn();
+}
+
 export function isErrorLike(target: unknown): target is Pick<Error, "message"> {
   const candidate = target as Error;
 
