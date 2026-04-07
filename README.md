@@ -345,7 +345,7 @@ Compose the link chain with logging, validation, mocking, and HTTP transport.
 ```typescript
 import type { HTTPLinkContext } from "rpcraft/http-link";
 
-import { createExecute, pipe, isCommandError } from "rpcraft";
+import { createExecute, pipe, isCommandError, subscribe } from "rpcraft";
 import { HTTPLink } from "rpcraft/http-link";
 import { LogLink } from "rpcraft/log-link";
 import { MockLink } from "rpcraft/mock-link";
@@ -426,12 +426,14 @@ const {
 console.log("initial todos:", todos);
 
 // Subscribe to real-time todo changes
-(async () => {
-  for await (const {
-    data: {
-      data: { operation, todo },
-    },
-  } of execute(SubscribeTodoChanges.create())) {
+subscribe(execute(SubscribeTodoChanges.create()), {
+  next(value) {
+    const {
+      data: {
+        data: { operation, todo },
+      },
+    } = value;
+
     switch (operation) {
       case "created": {
         todos.push(todo);
@@ -459,8 +461,8 @@ console.log("initial todos:", todos);
     }
 
     console.log(`todo "%s" %s -> todos:`, todo.id, operation, todos);
-  }
-})();
+  },
+});
 
 // Create a new todo
 const {
