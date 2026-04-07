@@ -192,16 +192,16 @@ const SubscribeTodoChanges = HTTP_BUILDER.subscription("todo.SubscribeTodoChange
 Implement command handlers with in-memory store and real-time event subscriptions.
 
 ```typescript
-import { router, promise, emittable, CommandError } from "rpcraft";
+import { router, promise, event, CommandError } from "rpcraft";
 
-// Handler type for todo change events
-type Handler = (data: { operation: Operation; todo: Todo }) => void;
+// Event data type for todo changes
+type TodoChange = { operation: Operation; todo: Todo };
+
+// Event emitter for subscriptions
+const todoChanges = event<TodoChange>();
 
 // In-memory todo store
 const todos = new Map<string, Todo>();
-
-// Event emitter for subscriptions
-const subscribers = new Set<Handler>();
 
 // Create the todo application router with all command handlers
 const appRouter = router
@@ -258,11 +258,7 @@ const appRouter = router
 
       todos.set(todo.id, todo);
 
-      const data = { operation: "created", todo } as const;
-
-      for (const handler of subscribers) {
-        handler(data);
-      }
+      todoChanges.next({ operation: "created", todo });
 
       return {
         data: { todo },
@@ -298,11 +294,7 @@ const appRouter = router
         todo.completed = completed;
       }
 
-      const data = { operation: "updated", todo } as const;
-
-      for (const handler of subscribers) {
-        handler(data);
-      }
+      todoChanges.next({ operation: "updated", todo });
 
       return {
         data: { todo },
@@ -331,30 +323,18 @@ const appRouter = router
 
       todos.delete(id);
 
-      const data = { operation: "removed", todo } as const;
-
-      for (const handler of subscribers) {
-        handler(data);
-      }
+      todoChanges.next({ operation: "removed", todo });
     });
   })
-  .handle(SubscribeTodoChanges, () => {
+  .handle(SubscribeTodoChanges, async function* () {
     // Produces async iterator for streaming events dynamically
-    return emittable((emitter) => {
-      const handler: Handler = (data) => {
-        emitter.next({
-          data: {
-            data,
-          },
-        });
+    for await (const value of todoChanges.stream()) {
+      yield {
+        data: {
+          data: value,
+        },
       };
-
-      subscribers.add(handler);
-
-      return () => {
-        subscribers.delete(handler);
-      };
-    });
+    }
   });
 ```
 
