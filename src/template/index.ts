@@ -98,6 +98,14 @@ export function parseTemplate(
 
       current = index + text.length;
     }
+
+    if (current < template.length) {
+      tokens.push({
+        index: current,
+        kind: "text",
+        text: template.slice(current),
+      });
+    }
   } else {
     tokens.push({
       index: 0,
