@@ -15,6 +15,7 @@ export type TemplateToken =
       kind: "variable";
       text: string;
       name: string;
+      raw: boolean;
       fallback?: string;
     };
 
@@ -78,6 +79,7 @@ export function parseTemplate(
 
       let name;
       let fallback;
+      let raw = false;
 
       const fallbackMarkerIndex = expression.indexOf("??");
 
@@ -88,11 +90,17 @@ export function parseTemplate(
         name = expression.trim();
       }
 
+      if (name.endsWith(":raw")) {
+        name = name.slice(0, -4);
+        raw = true;
+      }
+
       tokens.push({
         index,
         kind: "variable",
         text,
         name,
+        raw,
         fallback,
       });
 
@@ -128,7 +136,7 @@ export interface TemplateCompileRender {
   (variables?: TemplateVariables): string;
   $fn?: (
     variables: TemplateVariables,
-    stringify: (value: unknown) => string,
+    stringify: (value: unknown, raw?: boolean) => string,
     get: <TValue>(target: any, path: string[]) => TValue,
   ) => string;
 }
@@ -181,7 +189,7 @@ export function compileTemplate(
         return result + `var $${index} = ${JSON.stringify(text)};`;
       }
 
-      const { text, name, fallback } = token;
+      const { text, name, raw, fallback } = token;
 
       if (!name.includes(".")) {
         if (fallback === undefined) {
@@ -189,9 +197,9 @@ export function compileTemplate(
             result +
             `var $${index} = variables[${JSON.stringify(name)}];` +
             `if ($${index} === undefined) {` +
-            `$${index} = stringify(${JSON.stringify(text)});` +
+            `$${index} = stringify(${JSON.stringify(text)}, ${raw});` +
             `} else {` +
-            `$${index} = stringify($${index});` +
+            `$${index} = stringify($${index}, ${raw});` +
             `}`
           );
         }
@@ -200,9 +208,9 @@ export function compileTemplate(
           result +
           `var $${index} = variables[${JSON.stringify(name)}];` +
           `if ($${index} === undefined) {` +
-          `$${index} = stringify(${JSON.stringify(fallback)});` +
+          `$${index} = stringify(${JSON.stringify(fallback)}, ${raw});` +
           `} else {` +
-          `$${index} = stringify($${index});` +
+          `$${index} = stringify($${index}, ${raw});` +
           `}`
         );
       }
@@ -214,9 +222,9 @@ export function compileTemplate(
           `if ($${index} === undefined) {` +
           `$${index} = get(variables, ${JSON.stringify(name.split("."))});` +
           `if ($${index} === undefined) {` +
-          `$${index} = stringify(${JSON.stringify(text)});` +
+          `$${index} = stringify(${JSON.stringify(text)}, ${raw});` +
           `} else {` +
-          `$${index} = stringify($${index});` +
+          `$${index} = stringify($${index}, ${raw});` +
           `}` +
           `}`
         );
@@ -228,9 +236,9 @@ export function compileTemplate(
         `if ($${index} === undefined) {` +
         `$${index} = get(variables, ${JSON.stringify(name.split("."))});` +
         `if ($${index} === undefined) {` +
-        `$${index} = stringify(${JSON.stringify(fallback)});` +
+        `$${index} = stringify(${JSON.stringify(fallback)}, ${raw});` +
         `} else {` +
-        `$${index} = stringify($${index});` +
+        `$${index} = stringify($${index}, ${raw});` +
         `}` +
         `}`
       );
@@ -292,7 +300,7 @@ export function renderTemplate(
       return result + text;
     }
 
-    const { text, name, fallback } = token;
+    const { text, name, raw, fallback } = token;
 
     let value = variables[name];
 
@@ -308,15 +316,15 @@ export function renderTemplate(
       }
 
       if (value === undefined) {
-        return result + stringify(text);
+        return result + stringify(text, raw);
       }
     }
 
-    return result + stringify(value);
+    return result + stringify(value, raw);
   }, "");
 }
 
-const STRINGIFY_CACHE: Map<(value: string) => string, (value: unknown) => string> =
+const STRINGIFY_CACHE: Map<(value: string) => string, (value: unknown, raw?: boolean) => string> =
   /* @__PURE__ */ new Map();
 
 function createStringify(options: TemplateCompileOptions) {
@@ -329,7 +337,13 @@ function createStringify(options: TemplateCompileOptions) {
   let stringify = STRINGIFY_CACHE.get(escape);
 
   if (!stringify) {
-    stringify = (value: unknown) => escape(string(value));
+    stringify = (value: unknown, raw?: boolean) => {
+      if (!raw) {
+        return escape(string(value));
+      }
+
+      return string(value);
+    };
 
     STRINGIFY_CACHE.set(escape, stringify);
   }

@@ -9,7 +9,6 @@
   Ensure text after the last placeholder is captured as a text token
 
 - a108a27: chore: :arrow_up: Upgrade dependencies
-
   - eventsource-parser: ^3.0.6 → ^3.0.7
   - @changesets/cli: ^2.30.0 → ^2.31.0
   - oxfmt: ^0.44.0 → ^0.45.0
@@ -68,7 +67,6 @@
 
 - 1a01c52: `promise` now supports `onExit` callback for registering dispose functions (executed in LIFO order)
 - a28998a: Improve package exports with explicit `types` condition for IDE auto-completion
-
   - Add `./links/*` wildcard exports with `types` and `default` conditions
   - Update tsdown config to use custom exports configuration
   - Enable TypeScript language server to resolve types for subpath imports
