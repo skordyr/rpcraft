@@ -1,19 +1,19 @@
 # rpcraft
 
-Type-safe RPC toolkit for client and server, built to run anywhere.
+A platform-agnostic, type-safe RPC toolkit that crafts end-to-end types — a first-class API for command definitions, link composition, and streaming. Inspired by [tRPC](https://trpc.io).
 
 ## Highlights
 
-- 🔗 **End-to-End Type Safety:** One definition for client and server with fully typed inputs, outputs, and errors.
-- 🔌 **Extendability:** Build powerful middleware by composing links for auth, logging, and more.
-- 🔠 **Standard Schema Support:** Built on the Standard Schema spec, works with Zod, Valibot, ArkType, and more.
-- 📡 **Streaming:** Unified streaming abstraction via AsyncIterator, with Server-Sent Events powered by standard fetch streams.
-- 🌍 **Platform Agnostic:** Runs on any JavaScript runtime and simple to extend for browsers, Node.js, Cloudflare, Deno, Bun, and more.
-- 🪶 **Lightweight:** Minimal core with simple extension mechanism and tree-shakeable ESM for importing only what you need.
+- 🌐 **Platform Agnostic:** one definition, independent of platform and transport.
+- 🛡️ **Type Safe:** fully typed inputs, outputs, and errors, shared between client and server.
+- 🧅 **Links:** composable middleware, covering transport, logging, validation, mocking, and more.
+- 🌊 **Streaming:** unified streams, powered by AsyncIterator, with Server-Sent Events over standard fetch streams.
+- 📜 **Standard Schema:** built on the [Standard Schema spec](https://standardschema.dev), working with validators such as Zod, Valibot, and ArkType.
+- 🪶 **Lightweight:** minimal core, with tree-shakeable ESM for importing only what you need.
 
 ## Documentation
 
-Documentation coming soon. For now, refer to the examples above and the source code.
+Documentation coming soon. For now, refer to the examples below and the source code.
 
 ## Installation
 
@@ -33,7 +33,7 @@ yarn add rpcraft
 - [rpcraft/log-link](./src/links/log-link/index.ts): Execution logging for observability and debugging
 - [rpcraft/mock-link](./src/links/mock-link/index.ts): Mock command responses for development and isolated testing without backend dependencies
 - [rpcraft/rpc](./src/rpc/index.ts): JSON-RPC 2.0 compatible protocol implementation with client and server for inter-process and remote communication, minimal and extensible to any environment
-- [rpcraft/template](./src/template/index.ts): Lightweight template engine for fast variable substitution
+- [rpcraft/template](./src/template/index.ts): Lightweight template engine for fast variable substitution (`{name}`, `{name ?? fallback}`, `{name:raw}`)
 
 ## Overview
 
@@ -351,12 +351,18 @@ import { LogLink } from "rpcraft/log-link";
 import { MockLink } from "rpcraft/mock-link";
 import { ValidateLink } from "rpcraft/validate-link";
 
-// HTTP transport for remote API with authorization
+// Replace with your real token
+const token = "your-access-token";
+
+// HTTP transport with authorization
 const http = HTTPLink({
-  endpoint: "https://api.example.com",
+  endpoint: {
+    // Routes the "todo" command endpoint (meta.endpoint) to this base URL
+    todo: "https://api.example.com",
+  },
   headers: () => {
     return {
-      Authorization: `Bearer {token}`,
+      Authorization: `Bearer ${token}`,
     };
   },
 });

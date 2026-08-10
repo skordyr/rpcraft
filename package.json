@@ -1,7 +1,15 @@
 {
   "name": "rpcraft",
   "version": "0.2.5",
-  "description": "Type-safe RPC toolkit for client and server, built to run anywhere.",
+  "description": "A platform-agnostic, type-safe RPC toolkit that crafts end-to-end types — a first-class API for command definitions, link composition, and streaming. Inspired by tRPC.",
+  "keywords": [
+    "api",
+    "http",
+    "jsonrpc",
+    "rpc",
+    "schema-validation",
+    "typescript"
+  ],
   "homepage": "https://github.com/skordyr/rpcraft#readme",
   "license": "MIT",
   "author": "skordyr <xyan.sk@gmail.com>",
@@ -37,11 +45,11 @@
     "eventsource-parser": "^3.1.0"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.31.0",
-    "oxfmt": "^0.57.0",
-    "oxlint": "^1.72.0",
-    "tsdown": "^0.22.3",
-    "typescript": "^6.0.3"
+    "@changesets/cli": "^2.31.1",
+    "oxfmt": "^0.62.0",
+    "oxlint": "^1.77.0",
+    "tsdown": "^0.22.14",
+    "typescript": "^7.0.2"
   },
-  "packageManager": "pnpm@11.9.0"
+  "packageManager": "pnpm@11.21.0"
 }
