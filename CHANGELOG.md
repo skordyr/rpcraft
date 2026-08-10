@@ -1,5 +1,11 @@
 # rpcraft
 
+## 0.2.6
+
+### Patch Changes
+
+- 30d1672: docs: :memo: Polish README.md and add keywords to package.json
+
 ## 0.2.5
 
 ### Patch Changes
@@ -80,6 +86,7 @@
 
 - 1a01c52: `promise` now supports `onExit` callback for registering dispose functions (executed in LIFO order)
 - a28998a: Improve package exports with explicit `types` condition for IDE auto-completion
+
   - Add `./links/*` wildcard exports with `types` and `default` conditions
   - Update tsdown config to use custom exports configuration
   - Enable TypeScript language server to resolve types for subpath imports
