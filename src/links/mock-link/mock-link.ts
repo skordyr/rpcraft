@@ -1,4 +1,4 @@
-import type { Link, LinkOperation } from "../../link";
+import type { Link, LinkOperation, LinkResult } from "../../link";
 import type { Router } from "../../router";
 import type { Simplify, Thunkable } from "../../shared/types";
 import type { Context } from "../../types";
@@ -52,12 +52,14 @@ export function MockLink<TContext extends Context>(
       const entry = router.match($operation);
 
       if (entry) {
-        const [factory] = entry;
+        const [factory, link] = entry;
 
         if (factory.definition.meta === $operation.command.meta) {
           $operation.context[MOCK_LINK_CONTEXT] = { mocked: true };
 
-          return router.resolve($operation, next);
+          return link(router.prepare($operation, entry), next) as LinkResult<
+            Simplify<MockLinkOutContext & TContext>
+          >;
         }
       }
     }

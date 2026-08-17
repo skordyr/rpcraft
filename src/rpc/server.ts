@@ -84,21 +84,23 @@ export class RPCServer<TContext extends Context> {
         const entry = router.match(operation) as RouterEntry<TContext> | null;
 
         if (entry) {
+          const [, $link] = entry;
+
           let resolve;
 
           if (link) {
             resolve = resolveCache.get(entry);
 
             if (!resolve) {
-              resolve = pipe(link, entry[1]);
+              resolve = pipe(link, $link);
 
               resolveCache.set(entry, resolve);
             }
           } else {
-            resolve = entry[1];
+            resolve = $link;
           }
 
-          return resolve(router.prepare(operation), fallback);
+          return resolve(router.prepare(operation, entry), fallback);
         }
       }
 

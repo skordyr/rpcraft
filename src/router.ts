@@ -173,17 +173,11 @@ class Router$Router<
     const [factory] = entry;
 
     if (operation.command.meta !== factory.definition.meta) {
-      operation.command.meta = {
-        ...operation.command.meta,
-        ...factory.definition.meta,
-      };
+      operation.command.meta = factory.definition.meta;
     }
 
-    if (factory.definition.schema && operation.command.schema !== factory.definition.schema) {
-      operation.command.schema = {
-        ...operation.command.schema,
-        ...factory.definition.schema,
-      };
+    if (operation.command.schema !== factory.definition.schema) {
+      operation.command.schema = factory.definition.schema;
     }
 
     return operation;
