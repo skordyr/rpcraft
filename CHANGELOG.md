@@ -1,5 +1,21 @@
 # rpcraft
 
+## 0.2.7
+
+### Patch Changes
+
+- d50c380: refactor: :recycle: Canonicalize meta/schema in Router.prepare and invoke the matched link without re-matching
+
+  - `Router.prepare` canonicalizes the operation's command meta/schema to the factory's definition instead of merging them.
+  - MockLink and RPCServer resolve the matched link directly on the operation prepared by `Router.prepare`, avoiding a second `Router.match`.
+
+- 8c5d8e8: chore: :arrow_up: Upgrade dependencies
+
+  - eventsource-parser: ^3.1.0 → ^4.0.0
+  - @changesets/cli: ^2.31.1 → ^3.0.0
+  - oxfmt: ^0.62.0 → ^0.63.0
+  - oxlint: ^1.77.0 → ^1.78.0
+
 ## 0.2.6
 
 ### Patch Changes
