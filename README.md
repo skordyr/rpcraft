@@ -171,7 +171,7 @@ const SubscribeTodoChanges = HTTP_BUILDER.subscription("todo.SubscribeTodoChange
   endpoint: "todo",
   path: "/todos/events",
   method: "GET",
-  responseType: "event-stream-json",
+  responseDataType: "event-stream-json",
 } as const)
   .schema({
     // Compatible with HTTPLinkOutput structure

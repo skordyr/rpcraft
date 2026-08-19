@@ -8,7 +8,8 @@ import type {
   HTTPRequestMethod,
   HTTPRequestOptions,
   HTTPRequestParams,
-  HTTPRequestResponseType,
+  HTTPRequestRequestDataType,
+  HTTPRequestResponseDataType,
   HTTPRequestResult,
 } from "./request";
 
@@ -114,7 +115,9 @@ export type HTTPLinkData = HTTPRequestData;
 
 export type HTTPLinkHeaders = HTTPRequestHeaders;
 
-export type HTTPLinkResponseType = HTTPRequestResponseType;
+export type HTTPLinkRequestDataType = HTTPRequestRequestDataType;
+
+export type HTTPLinkResponseDataType = HTTPRequestResponseDataType;
 
 export type HTTPLinkContext = {
   timeout?: number;
@@ -137,7 +140,8 @@ export type HTTPLinkMeta = {
   params?: HTTPLinkParams;
   data?: HTTPLinkData;
   headers?: HTTPLinkHeaders;
-  responseType?: HTTPLinkResponseType;
+  requestDataType?: HTTPLinkRequestDataType;
+  responseDataType?: HTTPLinkResponseDataType;
   timeout?: number;
 };
 
@@ -219,13 +223,14 @@ export function HTTPLink<TContext extends Context>(
     const {
       meta: {
         method,
-        responseType,
         endpoint: metaEndpoint,
         path: metaPath,
         variables: metaVariables,
         params: metaParams,
         data: metaData,
         headers: metaHeaders,
+        requestDataType: metaRequestDataType,
+        responseDataType: metaResponseDataType,
         timeout: metaTimeout,
       },
       input: {
@@ -272,6 +277,8 @@ export function HTTPLink<TContext extends Context>(
       ...metaHeaders,
       ...inputHeaders,
     };
+    const requestDataType = metaRequestDataType ?? requestOptions?.requestDataType;
+    const responseDataType = metaResponseDataType ?? requestOptions?.responseDataType;
     const timeout = contextTimeout ?? metaTimeout ?? requestOptions?.timeout;
 
     for await (const result of request({
@@ -281,7 +288,8 @@ export function HTTPLink<TContext extends Context>(
       params,
       data,
       headers,
-      responseType,
+      requestDataType,
+      responseDataType,
       timeout,
       signal,
     })) {

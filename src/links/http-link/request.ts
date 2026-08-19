@@ -26,7 +26,9 @@ export type HTTPRequestHeaders = {
   [key: string]: HTTPRequestHeaderValue;
 };
 
-export type HTTPRequestResponseType =
+export type HTTPRequestRequestDataType = "text" | "json" | "form-urlencoded" | "form-data" | "raw";
+
+export type HTTPRequestResponseDataType =
   | "ignore"
   | "text"
   | "json"
@@ -35,7 +37,8 @@ export type HTTPRequestResponseType =
   | "stream-text"
   | "event-stream"
   | "event-stream-text"
-  | "event-stream-json";
+  | "event-stream-json"
+  | "raw";
 
 export type HTTPRequestStatus = number;
 
@@ -68,7 +71,8 @@ export interface HTTPRequestOptions extends Omit<RequestInit, "method" | "body" 
   params?: HTTPRequestParams;
   data?: HTTPRequestData;
   headers?: HTTPRequestHeaders;
-  responseType?: HTTPRequestResponseType;
+  requestDataType?: HTTPRequestRequestDataType;
+  responseDataType?: HTTPRequestResponseDataType;
   timeout?: number;
   stringifyData?(data: unknown): string;
   parseData?(text: string): unknown;
@@ -84,7 +88,8 @@ export async function* request(
     params,
     data,
     headers,
-    responseType = "json",
+    requestDataType = "json",
+    responseDataType = "json",
     timeout = 0,
     signal,
     stringifyData = DEFAULT_STRINGIFY_DATA,
@@ -93,30 +98,12 @@ export async function* request(
     ...fetchOptions
   } = options;
 
-  const isJsonData = Boolean(data && (Array.isArray(data) || isPlainObject(data)));
-  const search = params && stringifyParams(params);
   const controller = new AbortController();
-
-  const $url = search ? `${url}?${search}` : url;
-  const $body = isJsonData ? stringifyData(data) : (data as BodyInit);
-  const $headers = isJsonData || headers ? new Headers(headers && toEntries(headers)) : undefined;
-  const $signal = controller.signal;
-
-  if ($headers && isJsonData && !$headers.has("Content-Type")) {
-    $headers.set("Content-Type", "application/json");
-  }
-
-  const request = new Request($url, {
-    ...fetchOptions,
-    method,
-    body: $body,
-    headers: $headers,
-    signal: $signal,
-  });
 
   let closed = false;
   let isTimeout = false;
   let isAbort = false;
+  let request: Request | undefined;
   let response: Response | undefined;
   let disposeTimeout: (() => void) | undefined;
   let disposeSignal: (() => void) | undefined;
@@ -200,7 +187,7 @@ export async function* request(
       data,
       headers: $getHeaders()!,
       status: $getStatus()!,
-      request,
+      request: request!,
       response: response!,
     };
   };
@@ -224,6 +211,67 @@ export async function* request(
   };
 
   try {
+    const $signal = controller.signal;
+    const $search = params && stringifyParams(params);
+    const $url = $search ? `${url}?${$search}` : url;
+
+    let $headers = headers && toNativeHeaders(headers);
+    let $body: BodyInit | undefined;
+
+    const $addContentType = (contentType: string) => {
+      if ($headers?.has("Content-Type")) {
+        return;
+      }
+
+      if (!$headers) {
+        $headers = new Headers();
+      }
+
+      $headers.set("Content-Type", contentType);
+    };
+
+    if (data !== undefined && data !== null) {
+      switch (requestDataType) {
+        case "text": {
+          $body = typeof data === "string" ? data : stringifyData(data);
+
+          $addContentType("text/plain");
+
+          break;
+        }
+        case "json": {
+          $body = stringifyData(data);
+
+          $addContentType("application/json");
+
+          break;
+        }
+        case "form-urlencoded": {
+          $body = toNativeURLSearchParams(data);
+
+          break;
+        }
+        case "form-data": {
+          $body = toNativeFormData(data);
+
+          break;
+        }
+        case "raw": {
+          $body = data as BodyInit;
+
+          break;
+        }
+      }
+    }
+
+    request = new Request($url, {
+      ...fetchOptions,
+      method,
+      body: $body,
+      headers: $headers,
+      signal: $signal,
+    });
+
     response = await fetch(request);
 
     if (closed) {
@@ -233,7 +281,7 @@ export async function* request(
     }
 
     if (response.ok) {
-      switch (responseType) {
+      switch (responseDataType) {
         case "ignore": {
           yield $success();
 
@@ -337,6 +385,13 @@ export async function* request(
 
           break;
         }
+        case "raw": {
+          disposeTimeout?.();
+
+          yield $success(response);
+
+          break;
+        }
       }
 
       closed = true;
@@ -346,14 +401,14 @@ export async function* request(
       return;
     }
 
-    let data;
+    let $$data;
 
     try {
-      data = await response.text();
+      $$data = await response.text();
 
       disposeTimeout?.();
 
-      data = parseData(data);
+      $$data = parseData($$data);
     } catch {}
 
     if (closed) {
@@ -366,7 +421,7 @@ export async function* request(
 
     $dispose();
 
-    yield $error(new Error(`The server responded with status "${response.status}".`), data);
+    yield $error(new Error(`The server responded with status "${response.status}".`), $$data);
   } catch (error) {
     if (closed) {
       yield $abort();
@@ -398,27 +453,7 @@ function DEFAULT_PARSE_DATA(text: string) {
 }
 
 function DEFAULT_STRINGIFY_PARAMS(params: HTTPRequestParams) {
-  const init = toEntries(params);
-
-  return new URLSearchParams(init).toString();
-}
-
-type HTTPRequestEntry = [key: string, value: string];
-
-function toEntries(value: HTTPRequestParams | HTTPRequestHeaders) {
-  return Object.entries(value).reduce<HTTPRequestEntry[]>((result, [key, value]) => {
-    if (value !== undefined) {
-      if (Array.isArray(value)) {
-        for (const v of value) {
-          result.push([key, String(v)]);
-        }
-      } else {
-        result.push([key, String(value)]);
-      }
-    }
-
-    return result;
-  }, []);
+  return toNativeURLSearchParams(params).toString();
 }
 
 function toHeaders(value: Headers) {
@@ -427,7 +462,7 @@ function toHeaders(value: Headers) {
   value.forEach((value, key) => {
     const prevValue = headers[key];
 
-    if (!prevValue) {
+    if (prevValue === undefined) {
       headers[key] = value;
 
       return;
@@ -439,8 +474,82 @@ function toHeaders(value: Headers) {
       return;
     }
 
-    headers[key] = value;
+    headers[key] = [prevValue, value];
   });
 
   return headers;
+}
+
+function toNativeHeaders(target: unknown) {
+  if (!target) {
+    return new Headers();
+  }
+
+  if (target instanceof Headers) {
+    return target;
+  }
+
+  const headers = new Headers();
+
+  eachEntry(target, (key, value) => {
+    headers.append(key, String(value));
+  });
+
+  return headers;
+}
+
+function toNativeURLSearchParams(target: unknown) {
+  if (typeof target === "string") {
+    return new URLSearchParams(target);
+  }
+
+  if (target instanceof URLSearchParams) {
+    return target;
+  }
+
+  const params = new URLSearchParams();
+
+  eachEntry(target, (key, value) => {
+    params.append(key, String(value));
+  });
+
+  return params;
+}
+
+function toNativeFormData(target: unknown) {
+  if (!target) {
+    return new FormData();
+  }
+
+  if (target instanceof FormData) {
+    return target;
+  }
+
+  const formData = new FormData();
+
+  eachEntry(target, (key, value) => {
+    formData.append(key, value instanceof Blob ? value : String(value));
+  });
+
+  return formData;
+}
+
+function eachEntry(target: unknown, fn: (key: string, value: unknown) => void) {
+  if (!target || Array.isArray(target) || !isPlainObject(target)) {
+    return;
+  }
+
+  for (const [key, value] of Object.entries(target)) {
+    if (value !== undefined && value !== null) {
+      if (Array.isArray(value)) {
+        for (const $value of value) {
+          if ($value !== undefined && $value !== null) {
+            fn(key, $value);
+          }
+        }
+      } else {
+        fn(key, value);
+      }
+    }
+  }
 }
