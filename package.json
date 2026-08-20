@@ -1,6 +1,6 @@
 {
   "name": "rpcraft",
-  "version": "0.2.7",
+  "version": "0.3.0",
   "description": "A platform-agnostic, type-safe RPC toolkit that crafts end-to-end types — a first-class API for command definitions, link composition, and streaming. Inspired by tRPC.",
   "keywords": [
     "api",
