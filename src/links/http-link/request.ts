@@ -12,6 +12,7 @@ export type HTTPRequestMethod =
   | "PATCH"
   | "DELETE"
   | "HEAD"
+  | "QUERY"
   | (string & {});
 
 export type HTTPRequestParams = {
