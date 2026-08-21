@@ -499,6 +499,10 @@ function toNativeHeaders(target: unknown) {
 }
 
 function toNativeURLSearchParams(target: unknown) {
+  if (!target) {
+    return new URLSearchParams();
+  }
+
   if (typeof target === "string") {
     return new URLSearchParams(target);
   }
